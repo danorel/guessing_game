@@ -1,19 +1,42 @@
-use std::io;
-use std::cmp::Ordering;
-use std::ops::Range;
-use rand::Rng;
+use std::{io, cmp::Ordering};
 
-fn random () -> i32 {
-    rand::thread_rng().gen_range::<i32, Range::<i32>>(1..101)
+mod generator;
+mod player;
+
+fn register_number(mut secret_number: &i32) {
+    secret_number = generator::random();
 }
 
-fn main() {
-    println!("Game 'Guess the number'!");
+fn register_players(mut p1: player::Player, mut p2: player::Player) {
+    let mut nickname1 = String::new();
+    let mut nickname2 = String::new();
 
-    let secret_number = random();
+    println!("Player 1, enter your nickname:");
+
+    io::stdin()
+        .read_line(&mut nickname1)
+        .expect("Failed to read the nickname");
+
+
+    p1 = player::Player{ nickname: String::from(nickname1) };
+
+    println!("Player 2, enter your nickname:");
+
+    io::stdin()
+        .read_line(&mut nickname2)
+        .expect("Failed to read the nickname");
+
+    p2 = player::Player{ nickname: String::from(nickname2) };
+}
+
+fn game(mut p1: player::Player, mut p2: player::Player, secret_number: i32) {
+    let mut turn = true;
 
     loop {
-        println!("Please, input your number:");
+        if turn == true {
+            println!("{}, input your number:", p1.nickname);
+        }
+        
 
         let mut prompt = String::new();
 
@@ -35,4 +58,18 @@ fn main() {
             },
         }
     }
+}
+
+fn main() {
+    println!("Game 'Guess the number'!");
+
+    let mut p1 = player::Player{ nickname: String::from("") };
+    let mut p2  = player::Player{ nickname: String::from("") };
+
+    let mut secret_number: i32 = 0;
+
+    register_number(&secret_number);
+    register_players(p1, p2);
+
+    game(p1, p2, secret_number);
 }
